@@ -14,6 +14,7 @@ paths:
       tags:
         - Hotel
       summary: Create a new hotel
+      description: Add a new hotel in the system. Returns brief information of the created hotel
       operationId: createHotel
       requestBody:
         required: true
@@ -32,7 +33,8 @@ paths:
     get:
       tags:
         - Hotel
-      summary: Get brief information about all hotels
+      summary: Get all hotels
+      description: Returns a list of all hotels with brief information (ID, name, description, address, and phone)
       operationId: getHotels
       responses:
         '200':
@@ -48,7 +50,8 @@ paths:
     get:
       tags:
         - Hotel
-      summary: Get detailed information about a specific hotel
+      summary: Get one hotel by ID
+      description: Returns the specific hotel with full information (ID, name, description, address details, contacts, arrival times, list of amenities)
       operationId: getHotelById
       parameters:
         - name: id
@@ -57,6 +60,7 @@ paths:
           schema:
             type: integer
             format: int64
+            example: 1
       responses:
         '200':
           description: Detailed hotel information
@@ -70,6 +74,7 @@ paths:
       tags:
         - Hotel
       summary: Add amenities to a hotel
+      description: Add a list of amenity names to one hotel
       operationId: addAmenitiesToHotel
       parameters:
         - name: id
@@ -78,12 +83,25 @@ paths:
           schema:
             type: integer
             format: int64
+            example: 1
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AmenityWriteDto'
+            example: [
+              "Free parking",
+              "Free WiFi",
+              "Non-smoking rooms",
+              "Concierge",
+              "On-site restaurant",
+              "Fitness center",
+              "Pet-friendly rooms",
+              "Room service",
+              "Business center",
+              "Meeting rooms"
+            ]
       responses:
         '201':
           description: Amenities added successfully
@@ -93,30 +111,47 @@ paths:
       tags:
         - Hotel
       summary: Search hotels by parameters
+      description: Filter hotels by name, brand, city, country or specific amenities. Returns brief information for matching hotels
       operationId: searchHotels
       parameters:
         - name: name
           in: query
           schema:
             type: string
+            example: "DoubleTree by Hilton Minsk"
         - name: brand
           in: query
           schema:
             type: string
+            example: "Hilton"
         - name: city
           in: query
           schema:
             type: string
+            example: "Minsk"
         - name: country
           in: query
           schema:
             type: string
+            example: "Belarus"
         - name: amenities
           in: query
           schema:
             type: array
             items:
               type: string
+              example: [
+                "Free parking",
+                "Free WiFi",
+                "Non-smoking rooms",
+                "Concierge",
+                "On-site restaurant",
+                "Fitness center",
+                "Pet-friendly rooms",
+                "Room service",
+                "Business center",
+                "Meeting rooms"
+              ]
       responses:
         '200':
           description: Search results
@@ -131,7 +166,8 @@ paths:
     get:
       tags:
         - Hotel
-      summary: Get hotel count grouped by parameter
+      summary: Get hotel statistics (histogram)
+      description: Returns a list of hotel counts grouped by the specified parameter (brand, city, country or amenity)
       operationId: getHistogramHotels
       parameters:
         - name: param
@@ -139,6 +175,8 @@ paths:
           required: true
           schema:
             type: string
+            enum: [ brand, city, country, amenities ]
+            example: "city"
       responses:
         '200':
           description: Histogram data
@@ -148,6 +186,10 @@ paths:
                 type: object
                 additionalProperties:
                   type: integer
+                  example:
+                    "Minsk": 1
+                    "Moscow": 2
+                    "Mogilev": 1
 
 components:
   schemas:
@@ -158,14 +200,19 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
         name:
           type: string
+          example: "DoubleTree by Hilton Minsk"
         description:
           type: string
+          example: "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms..."
         address:
           type: string
+          example: "9 Pobediteley Avenue, Minsk, 220004, Belarus"
         phone:
           type: string
+          example: "+375 17 309-80-00"
 
     HotelFullDto:
       type: object
@@ -174,12 +221,16 @@ components:
         id:
           type: integer
           format: int64
+          example: 1
         name:
           type: string
+          example: "DoubleTree by Hilton Minsk"
         description:
           type: string
+          example: "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms..."
         brand:
           type: string
+          example: "Hilton"
         address:
           $ref: '#/components/schemas/AddressDto'
         contacts:
@@ -190,6 +241,18 @@ components:
           type: array
           items:
             type: string
+          example: [
+            "Free parking",
+            "Free WiFi",
+            "Non-smoking rooms",
+            "Concierge",
+            "On-site restaurant",
+            "Fitness center",
+            "Pet-friendly rooms",
+            "Room service",
+            "Business center",
+            "Meeting rooms"
+          ]
 
     HotelWriteDto:
       type: object
@@ -197,10 +260,13 @@ components:
       properties:
         name:
           type: string
+          example: "DoubleTree by Hilton Minsk"
         description:
           type: string
+          example: "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms..."
         brand:
           type: string
+          example: "Hilton"
         address:
           $ref: '#/components/schemas/AddressDto'
         contacts:
@@ -210,39 +276,60 @@ components:
 
     AddressDto:
       type: object
-      required: [houseNumber, street, city, country, postCode]
+      required: [ houseNumber, street, city, country, postCode ]
       properties:
         houseNumber:
           type: integer
           format: int32
+          example: 9
         street:
           type: string
+          example: "Pobediteley Avenue"
         city:
           type: string
+          example: "Minsk"
         country:
           type: string
+          example: "Belarus"
         postCode:
           type: string
+          example: "220004"
 
     ContactsDto:
       type: object
-      required: [phone, email]
+      required: [ phone, email ]
       properties:
         phone:
           type: string
+          example: "+375 17 309-80-00"
         email:
           type: string
+          example: "doubletreeminsk.info@hilton.com"
 
     ArrivalTimeDto:
       type: object
-      required: [checkIn, checkOut]
+      required: [ checkIn, checkOut ]
       properties:
         checkIn:
           type: string
+          example: "14:00"
         checkOut:
           type: string
+          example: "12:00"
 
     AmenityWriteDto:
       type: array
       items:
         type: string
+        example: [
+          "Free parking",
+          "Free WiFi",
+          "Non-smoking rooms",
+          "Concierge",
+          "On-site restaurant",
+          "Fitness center",
+          "Pet-friendly rooms",
+          "Room service",
+          "Business center",
+          "Meeting rooms"
+        ]

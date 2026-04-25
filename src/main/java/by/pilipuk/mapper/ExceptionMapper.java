@@ -25,10 +25,6 @@ import static java.util.Objects.isNull;
 )
 public abstract class ExceptionMapper {
 
-    @Mapping(target = "contexts", expression = "java(java.util.List.of(ex.getExceptionContext()))")
-    @Mapping(target = "rootCause", expression = "java(ex.getCause() != null ? ex.getCause().getMessage() : null)")
-    public abstract ExceptionDto toExceptionDto(BaseApplicationException ex);
-
     @Mapping(target = "code", constant = "REQUEST_VALIDATION")
     @Mapping(target = "contexts", source = ".", qualifiedByName = "mapContexts")
     @Mapping(target = "rootCause", source = ".", qualifiedByName = "getRootCause")
@@ -54,6 +50,10 @@ public abstract class ExceptionMapper {
     protected String getRootCause(Exception e) {
         return ExceptionUtils.getRootCauseMessage(e);
     }
+
+    @Mapping(target = "contexts", expression = "java(java.util.List.of(ex.getExceptionContext()))")
+    @Mapping(target = "rootCause", expression = "java(ex.getCause() != null ? ex.getCause().getMessage() : null)")
+    public abstract ExceptionDto toExceptionDto(BaseApplicationException ex);
 
     private List<ExceptionContext> deserialize(ObjectError error, String message) {
         try {
