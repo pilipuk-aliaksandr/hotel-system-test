@@ -1,17 +1,15 @@
 package by.pilipuk.controller;
 
-import by.pilipuk.exeption.base.BaseApplicationException;
 import by.pilipuk.mapper.ExceptionMapper;
+import by.pilipuk.exeption.base.BaseApplicationException;
 import by.pilipuk.model.dto.ExceptionDto;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
@@ -20,29 +18,32 @@ public class GlobalExceptionHandler {
 
     private final ExceptionMapper exceptionMapper;
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BaseApplicationException.class)
-    public ResponseEntity<ExceptionDto> handleExpectedApplicationException(BaseApplicationException ex, HttpServletRequest request) {
+    public ExceptionDto handleBaseApplicationException(BaseApplicationException ex) {
 
-        switch (ex.getLevel()) {
+        switch (ex.getLogLevel()) {
             case ERROR -> log.error("[ERROR] {}", ex.getMessage(), ex);
             case DEBUG -> log.debug("[DEBUG] {}", ex.getMessage());
-            default    -> log.info("[INFO] {}", ex.getMessage());
+            default -> log.info("[INFO] {}", ex.getMessage());
         }
 
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
-        ExceptionDto dto = exceptionMapper.toDto(ex, request, Objects.requireNonNull(status).value());
-
-        return new ResponseEntity<>(dto, status);
+        return exceptionMapper.toExceptionDto(ex);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ExceptionDto handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        log.debug("MethodArgumentNotValidException occurred:", ex);
+
+        return exceptionMapper.toExceptionDto(ex);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionDto> handleOtherApplicationException(Exception ex, HttpServletRequest request) {
+    public ExceptionDto handleOtherApplicationException(Exception ex) {
         log.error("[ERROR] {}", ex.getMessage(), ex);
 
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ExceptionDto dto = exceptionMapper.toDto(ex, request, status.value(), "INTERNAL_SERVER_ERROR");
-
-        return new ResponseEntity<>(dto, status);
+        return exceptionMapper.toExceptionDto(ex);
     }
 }
