@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldNameConstants;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +25,7 @@ public class Hotel extends BaseEntity {
 
     private String description;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
@@ -35,5 +38,6 @@ public class Hotel extends BaseEntity {
     private ArrivalTime arrivalTime;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.PERSIST)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Amenity> amenities = new ArrayList<>();
 }

@@ -31,10 +31,12 @@ public class HotelService {
     public HotelBriefDto createHotel(HotelWriteDto hotelWriteDto) {
         var hotel = hotelMapper.toEntity(hotelWriteDto);
         var savedHotel = hotelRepository.save(hotel);
+
         return hotelMapper.toBriefDto(savedHotel);
     }
 
     public List<HotelBriefDto> getAllHotels() {
+
         return hotelRepository.findAll()
                 .stream().map(hotelMapper::toBriefDto)
                 .toList();
@@ -57,6 +59,7 @@ public class HotelService {
 
     public HotelFullDto getHotelById(Long hotelId) {
         var hotel = hotelRepository.findByIdOrThrow(hotelId);
+
         return hotelMapper.toFullDto(hotel);
     }
 
@@ -71,6 +74,7 @@ public class HotelService {
     }
 
     public Map<String, Integer> getHistogramHotels(String param) {
+
         return hotelRepository.findAll().stream()
                 .flatMap(h -> switch (param.toLowerCase()) {
                     case "brand" -> Stream.of(h.getBrand());

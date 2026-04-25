@@ -13,11 +13,13 @@ import java.util.List;
 @Component
 public class HotelSpecificationMapper {
 
-    public Specification<Hotel> hotelSearchSpecification(@Nullable String name,
-                                                         @Nullable String brand,
-                                                         @Nullable String city,
-                                                         @Nullable String country,
-                                                         @Nullable List<String> amenities) {
+    public Specification<Hotel> hotelSearchSpecification(
+            @Nullable String name,
+            @Nullable String brand,
+            @Nullable String city,
+            @Nullable String country,
+            @Nullable List<String> amenities
+    ) {
         return Specification.allOf(
                 hasName(name),
                 hasBrand(brand),
@@ -28,35 +30,35 @@ public class HotelSpecificationMapper {
     }
 
     private static Specification<Hotel> hasName(String name) {
-        return (root, query, cb) ->
+        return (root, _, cb) ->
                 (name == null || name.isBlank())
                         ? cb.conjunction()
                         : cb.like(cb.lower(root.get(Hotel.Fields.name)), "%" + name.toLowerCase() + "%");
     }
 
     private static Specification<Hotel> hasBrand(String brand) {
-        return (root, query, cb) ->
+        return (root, _, cb) ->
                 (brand == null || brand.isBlank())
                         ? cb.conjunction()
                         : cb.equal(cb.lower(root.get(Hotel.Fields.brand)), brand.toLowerCase());
     }
 
     private static Specification<Hotel> hasCity(String city) {
-        return (root, query, cb) ->
+        return (root, _, cb) ->
                 (city == null || city.isBlank())
                         ? cb.conjunction()
                         : cb.equal(cb.lower(root.get(Hotel.Fields.address).get(Address.Fields.city)), city.toLowerCase());
     }
 
     private static Specification<Hotel> hasCountry(String country) {
-        return (root, query, cb) ->
+        return (root, _, cb) ->
                 (country == null || country.isBlank())
                         ? cb.conjunction()
                         : cb.equal(cb.lower(root.get(Hotel.Fields.address).get(Address.Fields.country)), country.toLowerCase());
     }
 
     private static Specification<Hotel> hasAmenities(List<String> amenities) {
-        return (root, query, cb) -> {
+        return (root, _, cb) -> {
             if (CollectionUtils.isEmpty(amenities)) {
                 return cb.conjunction();
             }
@@ -64,5 +66,4 @@ public class HotelSpecificationMapper {
             return amenityJoin.get(Amenity.Fields.name).in(amenities);
         };
     }
-
 }

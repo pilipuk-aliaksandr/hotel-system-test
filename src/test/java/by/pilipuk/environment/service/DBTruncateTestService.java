@@ -2,7 +2,6 @@ package by.pilipuk.environment.service;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import java.sql.PreparedStatement;
 import java.util.List;
 
 @Service
@@ -17,7 +16,6 @@ public class DBTruncateTestService {
     public static final String TRUNCATE_TABLES = "TRUNCATE TABLE %s RESTART IDENTITY";
 
     public void truncateAllTables() {
-        // 1. Отключаем проверку внешних ключей (аналог CASCADE в Postgres)
         jdbcTemplate.getJdbcOperations().execute("SET REFERENTIAL_INTEGRITY FALSE");
 
         try {
