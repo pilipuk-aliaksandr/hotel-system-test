@@ -1,6 +1,6 @@
-package by.pilipuk.entity;
+package by.pilipuk.model.entity;
 
-import by.pilipuk.entity.base.BaseEntity;
+import by.pilipuk.model.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ import lombok.experimental.FieldNameConstants;
 public class Address extends BaseEntity {
 
     @Column(name = "house_number")
-    private String houseNumber;
+    private Integer houseNumber;
 
     private String street;
 

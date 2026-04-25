@@ -1,6 +1,6 @@
 package by.pilipuk.repository;
 
-import by.pilipuk.entity.Address;
+import by.pilipuk.model.entity.Address;
 import by.pilipuk.exeption.ApplicationException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import static by.pilipuk.exeption.ApplicationExceptionCode.NOT_FOUND_BY_ID;

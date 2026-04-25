@@ -1,4 +1,4 @@
-package by.pilipuk.entity.base;
+package by.pilipuk.model.entity.base;
 
 import jakarta.persistence.*;
 import lombok.Getter;

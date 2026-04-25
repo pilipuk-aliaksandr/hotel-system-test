@@ -1,9 +1,9 @@
 package by.pilipuk.mapper;
 
 import by.pilipuk.dto.*;
-import by.pilipuk.entity.Address;
-import by.pilipuk.entity.Amenity;
-import by.pilipuk.entity.Hotel;
+import by.pilipuk.model.entity.Address;
+import by.pilipuk.model.entity.Amenity;
+import by.pilipuk.model.entity.Hotel;
 import lombok.Setter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,6 +33,18 @@ public abstract class HotelMapper {
         return String.format("%s %s, %s, %s, %s",
                 address.getHouseNumber(), address.getStreet(),
                 address.getCity(), address.getPostCode(), address.getCountry());
+    }
+
+    @Mapping(target = "address", source = "address", qualifiedByName = "addressDtoToString")
+    @Mapping(target = "phone", source = "contacts.phone")
+    public abstract HotelBriefDto toBriefDto(HotelFullDto hotelFullDto);
+
+    @Named("addressDtoToString")
+    protected String addressDtoToString(AddressDto addressDto) {
+        if (addressDto == null) return null;
+        return String.format("%s %s, %s, %s, %s",
+                addressDto.getHouseNumber(), addressDto.getStreet(),
+                addressDto.getCity(), addressDto.getPostCode(), addressDto.getCountry());
     }
 
     @Mapping(target = "id", ignore = true)

@@ -10,7 +10,7 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="pk_address_id"/>
             </column>
-            <column name="house_number" type="TEXT">
+            <column name="house_number" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="street" type="TEXT">

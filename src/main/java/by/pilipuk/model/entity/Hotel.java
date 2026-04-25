@@ -1,14 +1,13 @@
-package by.pilipuk.entity;
+package by.pilipuk.model.entity;
 
-import by.pilipuk.entity.base.BaseEntity;
+import by.pilipuk.model.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldNameConstants;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -35,7 +34,6 @@ public class Hotel extends BaseEntity {
     @JoinColumn(name = "arrival_time_id", nullable = false)
     private ArrivalTime arrivalTime;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
-    private List<Amenity> amenities;
-
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.PERSIST)
+    private List<Amenity> amenities = new ArrayList<>();
 }

@@ -1,6 +1,6 @@
 package by.pilipuk.repository;
 
-import by.pilipuk.entity.Hotel;
+import by.pilipuk.model.entity.Hotel;
 import by.pilipuk.exeption.ApplicationException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
