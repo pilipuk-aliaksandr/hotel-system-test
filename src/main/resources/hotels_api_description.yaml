@@ -85,7 +85,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AmenityWriteDto'
       responses:
-        '200':
+        '201':
           description: Amenities added successfully
 
   /search:
@@ -153,10 +153,11 @@ components:
   schemas:
     HotelBriefDto:
       type: object
-      required: [id, name, description, address, phone]
+      required: [ id, name, description, address, phone ]
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         description:
@@ -168,10 +169,11 @@ components:
 
     HotelFullDto:
       type: object
-      required: [id, name, description, brand, address, contacts, arrivalTime, amenities]
+      required: [ id, name, description, brand, address, contacts, arrivalTime, amenities ]
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         description:
@@ -191,7 +193,7 @@ components:
 
     HotelWriteDto:
       type: object
-      required: [name, brand, address, contacts, arrivalTime]
+      required: [ name, brand, address, contacts, arrivalTime ]
       properties:
         name:
           type: string
@@ -212,6 +214,7 @@ components:
       properties:
         houseNumber:
           type: integer
+          format: int32
         street:
           type: string
         city:

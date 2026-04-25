@@ -1,8 +1,8 @@
 package by.pilipuk.mapper;
 
-import by.pilipuk.entity.Address;
-import by.pilipuk.entity.Amenity;
-import by.pilipuk.entity.Hotel;
+import by.pilipuk.model.entity.Address;
+import by.pilipuk.model.entity.Amenity;
+import by.pilipuk.model.entity.Hotel;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;

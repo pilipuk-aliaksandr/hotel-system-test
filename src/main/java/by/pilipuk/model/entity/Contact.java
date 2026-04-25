@@ -1,8 +1,7 @@
-package by.pilipuk.entity;
+package by.pilipuk.model.entity;
 
-import by.pilipuk.entity.base.BaseEntity;
+import by.pilipuk.model.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

@@ -1,8 +1,8 @@
 package by.pilipuk.service;
 
 import by.pilipuk.dto.*;
-import by.pilipuk.entity.Amenity;
-import by.pilipuk.entity.Hotel;
+import by.pilipuk.model.entity.Amenity;
+import by.pilipuk.model.entity.Hotel;
 import by.pilipuk.mapper.HotelMapper;
 import by.pilipuk.mapper.HotelSpecificationMapper;
 import by.pilipuk.repository.AmenityRepository;
