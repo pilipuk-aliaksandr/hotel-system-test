@@ -1,12 +1,11 @@
 package by.pilipuk.model.dto;
 
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
-public record ExceptionDto(
-        int status,
-        String url,
-        Instant timestamp,
-        List<ExceptionContext> details
+@JsonInclude(JsonInclude.Include.NON_NULL)public record ExceptionDto(
+        String code,
+        List<ExceptionContext> contexts,
+        String rootCause
 ) {
 }

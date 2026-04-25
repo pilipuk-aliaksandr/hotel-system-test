@@ -1,5 +1,7 @@
 package by.pilipuk.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +14,8 @@ import java.util.Map;
 @Setter
 @FieldNameConstants
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder(value = { "code", "field", "message", "expected", "actual", "object", "parameters" })
 public class ExceptionContext {
 
     private String code;

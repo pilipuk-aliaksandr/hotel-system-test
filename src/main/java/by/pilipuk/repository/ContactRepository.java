@@ -1,15 +1,14 @@
 package by.pilipuk.repository;
 
 import by.pilipuk.entity.Contact;
-import by.pilipuk.exeption.ValidationException;
+import by.pilipuk.exeption.ApplicationException;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import static by.pilipuk.model.enums.ValidationCode.NOT_FOUND_BY_ID;
+import static by.pilipuk.exeption.ApplicationExceptionCode.NOT_FOUND_BY_ID;
 
 public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     default Contact findByIdOrThrow(Long id) {
         return findById(id)
-                .orElseThrow(() -> ValidationException.create(NOT_FOUND_BY_ID, id));
+                .orElseThrow(() -> ApplicationException.create(NOT_FOUND_BY_ID, id));
     }
 }

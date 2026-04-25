@@ -1,42 +1,123 @@
 package by.pilipuk.mapper;
 
 import by.pilipuk.exeption.base.BaseApplicationException;
+import by.pilipuk.util.Json;
 import by.pilipuk.model.dto.ExceptionContext;
 import by.pilipuk.model.dto.ExceptionDto;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.Setter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import org.mapstruct.Named;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import tools.jackson.core.type.TypeReference;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-@Setter(onMethod_ = @Autowired)
+import static java.util.Objects.isNull;
+
+@Mapper(
+        componentModel = "spring",
+        imports = {Instant.class}
+)
 public abstract class ExceptionMapper {
 
-    @Mapping(target = "status", source = "status")
-    @Mapping(target = "url", source = "request.requestURI")
-    @Mapping(target = "timestamp", expression = "java(java.time.Instant.now())")
-    @Mapping(target = "details", expression = "java(java.util.List.of(ex.getContext()))")
-    public abstract ExceptionDto toDto(BaseApplicationException ex, HttpServletRequest request, int status);
+    @Mapping(target = "contexts", expression = "java(java.util.List.of(ex.getExceptionContext()))")
+    @Mapping(target = "rootCause", expression = "java(ex.getCause() != null ? ex.getCause().getMessage() : null)")
+    public abstract ExceptionDto toExceptionDto(BaseApplicationException ex);
 
-//    @Mapping(target = "status", source = "status")
-//    @Mapping(target = "url", source = "request.requestURI")
-//    @Mapping(target = "timestamp", expression = "java(java.time.Instant.now())")
-//    @Mapping(target = "details", expression = "java(java.util.List.of(ex.getContext()))")
-//    public abstract ExceptionDto toDto(Exception ex, HttpServletRequest request, int status, String code);
+    @Mapping(target = "code", constant = "REQUEST_VALIDATION")
+    @Mapping(target = "contexts", source = ".", qualifiedByName = "mapContexts")
+    @Mapping(target = "rootCause", source = ".", qualifiedByName = "getRootCause")
+    public abstract ExceptionDto toExceptionDto(MethodArgumentNotValidException e);
 
-    public ExceptionDto toDto(Exception ex, HttpServletRequest request, int status, String code) {
-        ExceptionContext context = ExceptionContext.create(code);
+    @Named("mapContexts")
+    protected List<ExceptionContext> mapContexts(MethodArgumentNotValidException e) {
+        var contexts = new ArrayList<ExceptionContext>();
+
+        for (var error : e.getBindingResult().getAllErrors()) {
+            var message = error.getDefaultMessage();
+            if (message == null || message.isBlank()) {
+                continue;
+            }
+
+            contexts.addAll(deserialize(error, message));
+        }
+
+        return contexts;
+    }
+
+    @Named("getRootCause")
+    protected String getRootCause(Exception e) {
+        return ExceptionUtils.getRootCauseMessage(e);
+    }
+
+    private List<ExceptionContext> deserialize(ObjectError error, String message) {
+        try {
+            var contexts = Json.deserialize(
+                    message, new TypeReference<List<ExceptionContext>>() {
+                    }
+            );
+            contexts.forEach(context -> fillFields(error, context));
+            return contexts;
+        } catch (Exception e) {
+            ExceptionContext context = ExceptionContext.create(toSnakeCaseCode(error.getCode()));
+            context.setMessage(error.getDefaultMessage());
+
+            fillFields(error, context);
+
+            return Collections.singletonList(context);
+        }
+    }
+
+    private static String toSnakeCaseCode(String code) {
+        if (code == null) {
+            return null;
+        }
+
+        return code
+                .replaceAll(CAMEL_CASE_LOWER_TO_UPPER_REGEX, SNAKE_CASE_SEPARATOR_REPLACEMENT)
+                .replaceAll(CAMEL_CASE_ACRONYM_REGEX, SNAKE_CASE_SEPARATOR_REPLACEMENT)
+                .toUpperCase();
+    }
+
+    private static final String CAMEL_CASE_LOWER_TO_UPPER_REGEX = "([a-z0-9])([A-Z])";
+    private static final String CAMEL_CASE_ACRONYM_REGEX = "([A-Z]+)([A-Z][a-z])";
+    private static final String SNAKE_CASE_SEPARATOR_REPLACEMENT = "$1_$2";
+
+    private static void fillFields(ObjectError objectError, ExceptionContext context) {
+        if (objectError instanceof FieldError fieldError) {
+            if (isNull(context.getField())) {
+                context.setField(fieldError.getField());
+            }
+            if (isNull(context.getActual())) {
+                context.setActual(fieldError.getRejectedValue());
+            }
+        }
+
+        if (isNull(context.getObject())) {
+            context.setObject(objectError.getObjectName());
+        }
+
+        if (isNull(context.getExpected()) && objectError.getArguments() != null) {
+            Object[] args = objectError.getArguments();
+            if (args.length > 1) {
+                context.setExpected(args[1]);
+            }
+        }
+    }
+
+    public ExceptionDto toExceptionDto(Exception ex) {
+        ExceptionContext context = ExceptionContext.create("INTERNAL_SERVER_ERROR");
         context.setMessage(ex.getMessage());
 
-        return new ExceptionDto(
-                status,
-                request.getRequestURI(),
-                Instant.now(),
-                List.of(context)
-        );
+        String exCause = (ex.getCause() != null)
+                ? ex.getCause().toString()
+                : null;
+
+        return new ExceptionDto("UNEXPECTED_EXCEPTION", List.of(context), exCause);
     }
 }
