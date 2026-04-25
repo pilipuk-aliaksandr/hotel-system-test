@@ -1,0 +1,245 @@
+openapi: 3.0.4
+info:
+  title: Hotel Management API
+  description: API for managing hotels, amenities, and searching with histograms.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8092/property-view
+    description: Local development server
+
+paths:
+  /hotels:
+    post:
+      tags:
+        - Hotel
+      summary: Create a new hotel
+      operationId: createHotel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HotelWriteDto'
+      responses:
+        '201':
+          description: Hotel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HotelBriefDto'
+
+    get:
+      tags:
+        - Hotel
+      summary: Get brief information about all hotels
+      operationId: getHotels
+      responses:
+        '200':
+          description: A list of hotels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HotelBriefDto'
+
+  /hotels/{id}:
+    get:
+      tags:
+        - Hotel
+      summary: Get detailed information about a specific hotel
+      operationId: getHotelById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Detailed hotel information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HotelFullDto'
+
+  /hotels/{id}/amenities:
+    post:
+      tags:
+        - Hotel
+      summary: Add amenities to a hotel
+      operationId: addAmenitiesToHotel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmenityWriteDto'
+      responses:
+        '200':
+          description: Amenities added successfully
+
+  /search:
+    get:
+      tags:
+        - Hotel
+      summary: Search hotels by parameters
+      operationId: searchHotels
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: brand
+          in: query
+          schema:
+            type: string
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: country
+          in: query
+          schema:
+            type: string
+        - name: amenities
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HotelBriefDto'
+
+  /histogram/{param}:
+    get:
+      tags:
+        - Hotel
+      summary: Get hotel count grouped by parameter
+      operationId: getHistogramHotels
+      parameters:
+        - name: param
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Histogram data
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+
+components:
+  schemas:
+    HotelBriefDto:
+      type: object
+      required: [id, name, description, address, phone]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+
+    HotelFullDto:
+      type: object
+      required: [id, name, description, brand, address, contacts, arrivalTime, amenities]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        brand:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressDto'
+        contacts:
+          $ref: '#/components/schemas/ContactsDto'
+        arrivalTime:
+          $ref: '#/components/schemas/ArrivalTimeDto'
+        amenities:
+          type: array
+          items:
+            type: string
+
+    HotelWriteDto:
+      type: object
+      required: [name, brand, address, contacts, arrivalTime]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        brand:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressDto'
+        contacts:
+          $ref: '#/components/schemas/ContactsDto'
+        arrivalTime:
+          $ref: '#/components/schemas/ArrivalTimeDto'
+
+    AddressDto:
+      type: object
+      required: [houseNumber, street, city, country, postCode]
+      properties:
+        houseNumber:
+          type: integer
+        street:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        postCode:
+          type: string
+
+    ContactsDto:
+      type: object
+      required: [phone, email]
+      properties:
+        phone:
+          type: string
+        email:
+          type: string
+
+    ArrivalTimeDto:
+      type: object
+      required: [checkIn, checkOut]
+      properties:
+        checkIn:
+          type: string
+        checkOut:
+          type: string
+
+    AmenityWriteDto:
+      type: array
+      items:
+        type: string

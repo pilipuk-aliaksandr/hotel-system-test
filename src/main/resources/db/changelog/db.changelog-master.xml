@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <include file="migrations/intermediate-changelog.xml" relativeToChangelogFile="true"/>
+<!--    <include file="test-data/countries.xml" relativeToChangelogFile="true"/>-->
+<!--    <include file="test-data/cities.xml" relativeToChangelogFile="true"/>-->
+<!--    <include file="test-data/contacts.xml" relativeToChangelogFile="true"/>-->
+<!--    <include file="test-data/arrivalTimes.xml" relativeToChangelogFile="true"/>-->
+<!--    <include file="test-data/addresses.xml" relativeToChangelogFile="true"/>-->
+<!--    <include file="test-data/hotels.xml" relativeToChangelogFile="true"/>-->
+<!--    <include file="test-data/amenities.xml" relativeToChangelogFile="true"/>-->
+
+</databaseChangeLog>
