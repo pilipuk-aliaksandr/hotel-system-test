@@ -1,6 +1,9 @@
 package by.pilipuk.service;
 
 import by.pilipuk.dto.*;
+import by.pilipuk.exception.ApplicationException;
+import by.pilipuk.mapper.AmenityMapper;
+import by.pilipuk.model.dto.GroupCountProjection;
 import by.pilipuk.model.entity.Amenity;
 import by.pilipuk.model.entity.Hotel;
 import by.pilipuk.mapper.HotelMapper;
@@ -14,17 +17,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import static by.pilipuk.exception.ApplicationExceptionCode.INVALID_HISTOGRAM_PARAM;
 
 @Service
 @RequiredArgsConstructor
 public class HotelService {
 
+    private static final Set<String> VALID_PARAMS = Set.of("brand", "city", "country", "amenities");
+
     private final HotelMapper hotelMapper;
     private final HotelRepository hotelRepository;
+    private final AmenityMapper amenityMapper;
     private final AmenityRepository amenityRepository;
     private final HotelSpecificationMapper hotelSpecificationMapper;
 
@@ -60,6 +65,7 @@ public class HotelService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public HotelFullDto getHotelById(Long hotelId) {
         var hotel = hotelRepository.findByIdOrThrow(hotelId);
 
@@ -76,7 +82,7 @@ public class HotelService {
 
         List<Amenity> newAmenities = amenities.stream()
                 .filter(name -> !existingNames.contains(name))
-                .map(name -> new Amenity().setName(name).setHotel(hotel))
+                .map(name -> amenityMapper.toEntity(name, hotel))
                 .toList();
 
         amenityRepository.saveAll(newAmenities);
@@ -84,16 +90,23 @@ public class HotelService {
 
     @Transactional(readOnly = true)
     public Map<String, Integer> getHistogramHotels(String param) {
+        if (param == null || !VALID_PARAMS.contains(param.toLowerCase())) {
+            throw ApplicationException.create(INVALID_HISTOGRAM_PARAM, param);
+        }
 
-        return hotelRepository.findAll().stream()
-                .flatMap(h -> switch (param.toLowerCase()) {
-                    case "brand" -> Stream.of(h.getBrand());
-                    case "city" -> Stream.of(h.getAddress().getCity());
-                    case "country" -> Stream.of(h.getAddress().getCountry());
-                    case "amenities" -> h.getAmenities().stream().map(Amenity::getName);
-                    default -> throw new IllegalArgumentException("Unknown param: " + param);
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(val -> val, Collectors.summingInt(e -> 1)));
+        List<GroupCountProjection> result = switch (param.toLowerCase()) {
+            case "brand"    -> hotelRepository.countGroupByBrand();
+            case "city"     -> hotelRepository.countGroupByCity();
+            case "country"  -> hotelRepository.countGroupByCountry();
+            case "amenities"-> amenityRepository.countGroupByName();
+            default         -> throw new IllegalStateException(param);
+        };
+
+        return result.stream()
+                .filter(p -> p.getKey() != null)
+                .collect(Collectors.toMap(
+                        GroupCountProjection::getKey,
+                        p -> p.getCount().intValue()
+                ));
     }
 }

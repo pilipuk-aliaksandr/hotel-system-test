@@ -1,6 +1,6 @@
-package by.pilipuk.exeption;
+package by.pilipuk.exception;
 
-import by.pilipuk.exeption.base.BaseApplicationException;
+import by.pilipuk.exception.base.BaseApplicationException;
 import by.pilipuk.model.dto.ExceptionContext;
 import org.slf4j.event.Level;
 

@@ -11,7 +11,7 @@ public class Json {
         try {
             return MAPPER.writeValueAsString(object);
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -22,7 +22,7 @@ public class Json {
         try {
             return MAPPER.readValue(object, objectType);
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

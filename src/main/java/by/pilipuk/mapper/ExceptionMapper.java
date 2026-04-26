@@ -1,6 +1,6 @@
 package by.pilipuk.mapper;
 
-import by.pilipuk.exeption.base.BaseApplicationException;
+import by.pilipuk.exception.base.BaseApplicationException;
 import by.pilipuk.util.Json;
 import by.pilipuk.model.dto.ExceptionContext;
 import by.pilipuk.model.dto.ExceptionDto;

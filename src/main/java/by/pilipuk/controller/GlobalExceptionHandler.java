@@ -1,7 +1,8 @@
 package by.pilipuk.controller;
 
+import by.pilipuk.exception.ApplicationException;
 import by.pilipuk.mapper.ExceptionMapper;
-import by.pilipuk.exeption.base.BaseApplicationException;
+import by.pilipuk.exception.base.BaseApplicationException;
 import by.pilipuk.model.dto.ExceptionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +19,16 @@ public class GlobalExceptionHandler {
 
     private final ExceptionMapper exceptionMapper;
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ApplicationException.class)
+    public ExceptionDto handleApplicationException(ApplicationException ex) {
+        return getExceptionDto(ex);
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BaseApplicationException.class)
     public ExceptionDto handleBaseApplicationException(BaseApplicationException ex) {
-
-        switch (ex.getLogLevel()) {
-            case ERROR -> log.error("[ERROR] {}", ex.getMessage(), ex);
-            case DEBUG -> log.debug("[DEBUG] {}", ex.getMessage());
-            default -> log.info("[INFO] {}", ex.getMessage());
-        }
-
-        return exceptionMapper.toExceptionDto(ex);
+        return getExceptionDto(ex);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -44,6 +44,15 @@ public class GlobalExceptionHandler {
     public ExceptionDto handleOtherApplicationException(Exception ex) {
         log.error("[ERROR] {}", ex.getMessage(), ex);
 
+        return exceptionMapper.toExceptionDto(ex);
+    }
+
+    private ExceptionDto getExceptionDto(BaseApplicationException ex) {
+        switch (ex.getLogLevel()) {
+            case ERROR -> log.error("[ERROR] {}", ex.getMessage(), ex);
+            case DEBUG -> log.debug("[DEBUG] {}", ex.getMessage());
+            default -> log.info("[INFO] {}", ex.getMessage());
+        }
         return exceptionMapper.toExceptionDto(ex);
     }
 }
