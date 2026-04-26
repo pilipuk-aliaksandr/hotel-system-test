@@ -33,6 +33,14 @@ http://localhost:8092/property-view/swagger-ui/index.html
 
 * Developed "out-of-the-box" support for **H2 Database** (in-memory) for rapid automated evaluation. Also offering a production-ready **PostgreSQL** integration via **Docker-Compose** infrastructure.
 
+* Implemented **advanced Error Handling (Global exception handler) mechanism**. It features:
+
+* * **Multi-level logging:** Custom exceptions have their own `SLF4J` logging levels, allowing the handler to automatically switch between `ERROR`, `DEBUG`, or `INFO` logging levels depending on the specific error context.
+
+* * **Unified Response Format:** Guaranteed consistent `ExceptionDto` structure for all errors, including validation failures (`MethodArgumentNotValidException`) and unexpected server errors.
+
+* * **Context-Aware Exceptions:** A base abstraction (`BaseApplicationException`) that captures dynamic parameters, error codes, and metadata, mapped directly to API responses via MapStruct.
+
 * Implemented comprehensive Integration Tests for REST endpoints to validate business logic, status codes, and JSON response structures in an automated environment.
 
 ## 📊 Endpoints
