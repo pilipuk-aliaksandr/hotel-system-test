@@ -58,10 +58,11 @@ public class HotelSpecificationMapper {
     }
 
     private static Specification<Hotel> hasAmenities(List<String> amenities) {
-        return (root, _, cb) -> {
+        return (root, query, cb) -> {
             if (CollectionUtils.isEmpty(amenities)) {
                 return cb.conjunction();
             }
+            query.distinct(true);
             Join<Hotel, Amenity> amenityJoin = root.join(Hotel.Fields.amenities);
             return amenityJoin.get(Amenity.Fields.name).in(amenities);
         };

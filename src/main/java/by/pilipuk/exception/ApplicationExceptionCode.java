@@ -1,11 +1,12 @@
-package by.pilipuk.exeption;
+package by.pilipuk.exception;
 
 import lombok.Getter;
 import org.slf4j.event.Level;
 
 @Getter
 public enum ApplicationExceptionCode {
-    NOT_FOUND_BY_ID(Level.INFO, "id");
+    NOT_FOUND_BY_ID(Level.INFO, "id"),
+    INVALID_HISTOGRAM_PARAM(Level.INFO, "param");
 
     private final Level level;
     private final String key;
