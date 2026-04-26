@@ -139,7 +139,6 @@
                                 <useResponseEntity>false</useResponseEntity>
                                 <openApiNullable>false</openApiNullable>
                                 <useTags>true</useTags>
-                                <sortParamsByRequiredFlag>true</sortParamsByRequiredFlag>
                             </configOptions>
                         </configuration>
                     </execution>

@@ -14,7 +14,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="check_out" type="TEXT">
-                <constraints nullable="false"/>
             </column>
             <column name="active" type="BOOLEAN">
                 <constraints nullable="false"/>

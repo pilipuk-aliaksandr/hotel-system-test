@@ -74,7 +74,7 @@ paths:
       tags:
         - Hotel
       summary: Add amenities to a hotel
-      description: Add a list of amenity names to one hotel
+      description: Add a list of amenity names to one hotel. If an amenity already exists, it won't be duplicated
       operationId: addAmenitiesToHotel
       parameters:
         - name: id
@@ -308,7 +308,7 @@ components:
 
     ArrivalTimeDto:
       type: object
-      required: [ checkIn, checkOut ]
+      required: [ checkIn ]
       properties:
         checkIn:
           type: string

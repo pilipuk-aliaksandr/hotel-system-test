@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,6 +36,7 @@ public class HotelService {
         return hotelMapper.toBriefDto(savedHotel);
     }
 
+    @Transactional(readOnly = true)
     public List<HotelBriefDto> getAllHotels() {
 
         return hotelRepository.findAll()
@@ -42,6 +44,7 @@ public class HotelService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<HotelBriefDto> searchHotels(
             @Nullable String name,
             @Nullable String brand,
@@ -63,16 +66,23 @@ public class HotelService {
         return hotelMapper.toFullDto(hotel);
     }
 
+    @Transactional
     public void addAmenitiesToHotel(Long id, List<String> amenities) {
         var hotel = hotelRepository.findByIdOrThrow(id);
 
-        List<Amenity> filledAmenities = amenities.stream()
+        Set<String> existingNames = hotel.getAmenities().stream()
+                .map(Amenity::getName)
+                .collect(Collectors.toSet());
+
+        List<Amenity> newAmenities = amenities.stream()
+                .filter(name -> !existingNames.contains(name))
                 .map(name -> new Amenity().setName(name).setHotel(hotel))
                 .toList();
 
-        amenityRepository.saveAll(filledAmenities);
+        amenityRepository.saveAll(newAmenities);
     }
 
+    @Transactional(readOnly = true)
     public Map<String, Integer> getHistogramHotels(String param) {
 
         return hotelRepository.findAll().stream()

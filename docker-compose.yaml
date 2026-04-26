@@ -1,0 +1,31 @@
+services:
+  postgres-hotels:
+    image: postgis/postgis:12-2.5-alpine
+    container_name: hotel-db-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hotel_db
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hotel_db"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+
+  liquibase-hotels:
+    image: liquibase/liquibase:4.6.2
+    container_name: liquibase-migration-postgre-hotel
+    depends_on:
+      postgres-hotels:
+        condition: service_healthy
+    volumes:
+      - ./src/main/resources/db/changelog:/liquibase/changelog
+    command: >
+      --changelog-file=db.changelog-master.xml
+      --url=jdbc:postgresql://postgres-hotels:5432/hotel_db
+      --username=postgres
+      --password=postgres
+      --driver=org.postgresql.Driver
+      update

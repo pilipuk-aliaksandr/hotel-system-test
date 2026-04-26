@@ -14,7 +14,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT">
-                <constraints nullable="false"/>
             </column>
             <column name="brand" type="TEXT">
                 <constraints nullable="false"/>
