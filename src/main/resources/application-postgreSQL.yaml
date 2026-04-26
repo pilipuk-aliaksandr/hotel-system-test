@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hoteldb
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+test:
+  sql:
+    disable-constraints: SET session_replication_role = 'replica'
+    enable-constraints: SET session_replication_role = 'origin'
+    truncate-table: TRUNCATE TABLE %s RESTART IDENTITY CASCADE

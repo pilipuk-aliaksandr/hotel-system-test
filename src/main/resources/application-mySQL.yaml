@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/hoteldb?useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+test:
+  sql:
+    disable-constraints: SET FOREIGN_KEY_CHECKS = 0
+    enable-constraints: SET FOREIGN_KEY_CHECKS = 1
+    truncate-table: TRUNCATE TABLE %s

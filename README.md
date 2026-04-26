@@ -5,7 +5,7 @@ _RESTful API application for managing hotels, built with Spring Boot._
 ## 🛠 Tech Stack
 * **Java 24**
 * **Spring Boot 4.0.0**
-* **Database:** H2 (with the ability to quickly migrate to PostgreSQL)
+* **Database:** H2 (with the ability to quickly migrate to PostgreSQL or MySQL)
 * **Migration Tool:** Liquibase
 * **Documentation:** Swagger (OpenAPI 3.0)
 * **Build System:** Maven
@@ -23,6 +23,32 @@ The application will start **on port 8092** with context path `/property-view`.
 Once the app is running, access Swagger UI at:
 http://localhost:8092/property-view/swagger-ui/index.html
 
+## 🔄 Database Profiles
+
+The application **supports multiple database profiles** for flexible deployment.
+
+### H2 (Default)
+
+In-memory database for development and testing:
+
+```
+mvn spring-boot:run
+```
+
+### PostgreSQL
+
+```
+docker-compose up postgres-hotels liquibase-postgres
+mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+```
+
+### MySQL
+
+```
+docker-compose up mysql-hotels liquibase-mysql
+mvn spring-boot:run -Dspring-boot.run.profiles=mysql
+```
+
 ## 📋 Features
 
 * Developed a full-featured **RESTful** architecture (Controllers, DTOs, Services, Mappers, Domain Models, and Repositories) using **SOLID** principles and **Clean Architecture**.
@@ -31,9 +57,11 @@ http://localhost:8092/property-view/swagger-ui/index.html
 
 * Implemented **OpenAPI Generator** and **Swagger documentation** with detailed operation summaries, realistic request/response examples, and clear definitions for optional fields.
 
-* Developed "out-of-the-box" support for **H2 Database** (in-memory) for rapid automated evaluation. Also offering a production-ready **PostgreSQL** integration via **Docker-Compose** infrastructure.
+* Developed "out-of-the-box" support for **H2 Database** (in-memory) for rapid automated evaluation. Also offering a production-ready **PostgreSQL** or **MySQL** integration via **Docker-Compose** infrastructure.
 
-* Implemented **advanced Error Handling (Global exception handler) mechanism**. It features:
+* Implemented **multiple database profiles** (H2, PostgreSQL, MySQL) for quick switching between databases without code changes.
+
+* Implemented **advanced Error Handling** (Global exception handler) **mechanism**. It features:
 
 * * **Multi-level logging:** Custom exceptions have their own `SLF4J` logging levels, allowing the handler to automatically switch between `ERROR`, `DEBUG`, or `INFO` logging levels depending on the specific error context.
 
@@ -41,7 +69,9 @@ http://localhost:8092/property-view/swagger-ui/index.html
 
 * * **Context-Aware Exceptions:** A base abstraction (`BaseApplicationException`) that captures dynamic parameters, error codes, and metadata, mapped directly to API responses via MapStruct.
 
-* Implemented comprehensive Integration Tests for REST endpoints to validate business logic, status codes, and JSON response structures in an automated environment.
+* Implemented **AOP-based logging** for all controller endpoints and database operations using Spring AOP, providing request tracking with HTTP method, URL, and execution flow visibility.
+
+* Implemented comprehensive **Integration Tests** for REST endpoints to validate business logic, status codes, and JSON response structures in an automated environment.
 
 ## 📊 Endpoints
 

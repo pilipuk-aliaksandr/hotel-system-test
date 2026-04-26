@@ -1,22 +1,36 @@
 services:
   postgres-hotels:
-    image: postgis/postgis:12-2.5-alpine
+    image: postgres:16-alpine
     container_name: hotel-db-postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=hotel_db
+      - POSTGRES_DB=hoteldb
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d hotel_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hoteldb"]
       interval: 10s
       timeout: 3s
       retries: 15
 
-  liquibase-hotels:
+  mysql-hotels:
+    image: mysql:8-alpine
+    container_name: hotel-db-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=hoteldb
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+
+  liquibase-postgres:
     image: liquibase/liquibase:4.6.2
-    container_name: liquibase-migration-postgre-hotel
+    container_name: liquibase-migration-postgres
     depends_on:
       postgres-hotels:
         condition: service_healthy
@@ -24,8 +38,24 @@ services:
       - ./src/main/resources/db/changelog:/liquibase/changelog
     command: >
       --changelog-file=db.changelog-master.xml
-      --url=jdbc:postgresql://postgres-hotels:5432/hotel_db
+      --url=jdbc:postgresql://postgres-hotels:5432/hoteldb
       --username=postgres
       --password=postgres
       --driver=org.postgresql.Driver
+      update
+
+  liquibase-mysql:
+    image: liquibase/liquibase:4.6.2
+    container_name: liquibase-migration-mysql
+    depends_on:
+      mysql-hotels:
+        condition: service_healthy
+    volumes:
+      - ./src/main/resources/db/changelog:/liquibase/changelog
+    command: >
+      --changelog-file=db.changelog-master.xml
+      --url=jdbc:mysql://mysql-hotels:3306/hoteldb?useSSL=false&serverTimezone=UTC
+      --username=root
+      --password=root
+      --driver=com.mysql.cj.jdbc.Driver
       update
