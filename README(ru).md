@@ -48,14 +48,14 @@ mvn spring-boot:run
 ### PostgreSQL
 
 ```
-docker-compose up postgres-hotels liquibase-postgres
+docker-compose up -d postgres-hotels liquibase-postgres
 mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 ```
 
 ### MySQL
 
 ```
-docker-compose up mysql-hotels liquibase-mysql
+docker-compose up -d mysql-hotels liquibase-mysql
 mvn spring-boot:run -Dspring-boot.run.profiles=mysql
 ```
 
